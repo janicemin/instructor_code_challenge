@@ -6,7 +6,14 @@
 
 - Now that you've solved all the problems, let's enhance the app.
 - Replace the file based persistence with MongoDB, using mongoose.js.
-- Starting with:
+- Continuing on from the solution to last night's homework. Remember:
+
+```
+cd path/to/last_nights_homework
+git checkout starter_with_mongoose
+git checkout -b solution_with_mongoose_YOUR_NAME # i.e. solution_with_mongoose_matt_s
+
+-
 ```
 npm install --save mongoose
 ```
