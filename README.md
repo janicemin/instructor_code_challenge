@@ -21,3 +21,8 @@ npm install --save mongoose
   - list all favorites created from the above route.
 
 Just like before -- only now it's persisted to MongoDB.
+
+## Bonus:
+
+- /favorites returns the same json as before (no `_id`).
+- Use promises
