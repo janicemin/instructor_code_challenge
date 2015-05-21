@@ -3,29 +3,48 @@ var app = express();
 var bodyParser = require("body-parser")
 var fs = require('fs');
 var path = require('path');
+var mongoose = require ('mongoose');
+mongoose.connect('mongodb://localhost/instructor_code_challenge');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
 
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 
-app.get('/favorites', function(req, res){
-  var data = fs.readFileSync('./data.json');
-  res.setHeader('Content-Type', 'application/json');
-  res.send(data);
-});
+var favoriteSchema = mongoose.Schema({
+  oid: String,
+  name: String
+})
+
+var Favorite = mongoose.model('Favorite', favoriteSchema);
+console.log("Favorites look like" + Object.keys(favoriteSchema.paths))
+
+
+app.get('/favorites', function(req, res){   
+var query = Favorite.find({})
+console.log("here's the" + query)
+  query.select('-_id oid name');
+  query.exec(function(err, favorites){
+    if (err) return handleError(err);
+    console.log("Found", favorites.length, "favorites.")
+    res.setHeader('Content-Type', 'application/json');
+    res.send(favorites);
+  })
 
 app.post('/favorites', function(req, res){
   if(!req.body.name || !req.body.oid){
     res.send("Error: [oid, name] are required.  Found: '" + Object.keys(req.body) + "'");
     return
   }
-  var data = JSON.parse(fs.readFileSync('./data.json'));
-  data.push(req.body);
-  fs.writeFile('./data.json', JSON.stringify(data));
-  res.setHeader('Content-Type', 'application/json');
-  res.send(data);
+
+ Favorite.create(req.body, function(err, fav){
+  if(err) return handleError(err);
+  res.setHeader('Content-Type, application/json');
+  res.send(fav);
+ });
 });
 
 app.listen(3000, function(){
